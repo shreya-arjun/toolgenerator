@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+src/toolgenerator/__init__.py
+src/toolgenerator.egg-info/PKG-INFO
+src/toolgenerator.egg-info/SOURCES.txt
+src/toolgenerator.egg-info/dependency_links.txt
+src/toolgenerator.egg-info/top_level.txt
+src/toolgenerator/registry/__init__.py
+src/toolgenerator/registry/loader.py
+src/toolgenerator/registry/normalizer.py
+src/toolgenerator/registry/registry.py

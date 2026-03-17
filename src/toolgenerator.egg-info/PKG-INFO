@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: toolgenerator
+Version: 0.1.0
+Summary: Offline multi-agent tool-use conversation generator
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+
+# ToolGenerator
+
+Offline multi-agent tool-use conversation generator.
+
+Internship assessment project.

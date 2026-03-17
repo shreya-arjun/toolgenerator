@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "toolgenerator"
+version = "0.1.0"
+description = "Offline multi-agent tool-use conversation generator"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mem0ai",
+    "networkx",
+    "openai",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
