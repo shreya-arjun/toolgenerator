@@ -12,6 +12,7 @@ dependencies = [
     "mem0ai",
     "networkx",
     "openai",
+    "pydantic>=2",
 ]
 
 [tool.setuptools.packages.find]
