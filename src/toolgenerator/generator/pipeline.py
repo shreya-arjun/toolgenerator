@@ -165,7 +165,7 @@ def run_pipeline(
             # Session memory write (after every tool call)
             memory.add(
                 content=json.dumps(run_result.get("output") or {}),
-                scope="session",
+                scope=f"session:{conversation_id}",
                 metadata={
                     "conversation_id": conversation_id,
                     "step": step_index,

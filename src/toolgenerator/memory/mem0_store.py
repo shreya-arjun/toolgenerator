@@ -13,7 +13,7 @@ class Mem0MemoryStore(MemoryStore):
     MemoryStore backed by mem0 (in-process Qdrant).
 
     Scope isolation:
-    - scope="session" → user_id="session:{conversation_id}" (from metadata on add, from conversation_id on search)
+    - scope="session:{conversation_id}" → user_id="session:{conversation_id}"
     - scope="corpus" → user_id="corpus"
     """
 
@@ -21,7 +21,7 @@ class Mem0MemoryStore(MemoryStore):
         self._memory = Memory()
 
     def add(self, content: str, scope: str, metadata: dict) -> None:
-        conversation_id = metadata.get("conversation_id") if scope == "session" else None
+        conversation_id = metadata.get("conversation_id")
         user_id = _user_id(scope, conversation_id)
         self._memory.add(
             messages=[{"role": "user", "content": content}],

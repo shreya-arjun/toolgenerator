@@ -11,7 +11,7 @@ class MemoryStore(ABC):
     Abstract memory store: add content under a scope, search by query within a scope.
 
     Scopes used in this project:
-    - "session": in-conversation grounding (tool outputs); isolated per conversation.
+    - "session:{conversation_id}": in-conversation grounding (tool outputs).
     - "corpus": cross-conversation (summaries); shared.
 
     Other components must depend only on this interface, not on any concrete backend.
@@ -28,20 +28,17 @@ class MemoryStore(ABC):
         query: str,
         scope: str,
         top_k: int = 5,
-        conversation_id: str | None = None,
     ) -> list[dict]:
         """
         Search within a scope; return list of dicts with at least "content" and optionally "metadata".
-
-        For scope="session", conversation_id must be provided so the store can
-        query only that conversation's entries. For scope="corpus", conversation_id
-        is ignored.
         """
         ...
 
 
-def _user_id(scope: str, conversation_id: str | None) -> str:
-    """Build mem0 user_id from scope and optional conversation_id."""
+def _user_id(scope: str, conversation_id: str | None = None) -> str:
+    """Build a backend namespace from scope, preserving scoped session keys."""
+    if scope.startswith("session:"):
+        return scope
     if scope == "session":
         return f"session:{conversation_id or ''}"
     if scope == "corpus":

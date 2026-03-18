@@ -71,6 +71,43 @@ def _params_schema_text(endpoint: Endpoint) -> str:
     return "\n".join(lines) if lines else "  (none)"
 
 
+def _default_argument_value(param_type: str, default: Any) -> Any:
+    """Return a deterministic fallback argument value for a parameter."""
+    if default is not None:
+        return default
+    if param_type == "integer":
+        return 0
+    if param_type == "number":
+        return 0
+    if param_type == "boolean":
+        return False
+    if param_type == "array":
+        return []
+    if param_type == "object":
+        return {}
+    return ""
+
+
+def _template_arguments(endpoint: Endpoint) -> dict[str, Any]:
+    """Build deterministic fallback args from required parameter schema."""
+    return {
+        param.name: _default_argument_value(param.type, param.default)
+        for param in endpoint.required_parameters
+        if param.name
+    }
+
+
+def _clarification_question(endpoint: Endpoint) -> str:
+    """Build a short schema-based clarification question."""
+    if not endpoint.required_parameters:
+        return "Could you provide more details about what you need?"
+    names = [param.name for param in endpoint.required_parameters if param.name]
+    if len(names) == 1:
+        return f"What should I use for `{names[0]}`?"
+    joined = ", ".join(f"`{name}`" for name in names[:-1])
+    return f"What should I use for {joined}, and `{names[-1]}`?"
+
+
 class AssistantAgent:
     """
     Produces assistant turns: clarification (when required params can't be filled)
@@ -120,17 +157,29 @@ class AssistantAgent:
 
         endpoint = tool_chain[current_endpoint_index]
         is_first_tool_call = current_endpoint_index == 0
+        has_prior_clarification = any(
+            m.get("role") == "assistant" and (m.get("content") or "").strip() and not m.get("tool_call")
+            for m in messages_so_far
+        )
 
         # Session memory read for non-first tool calls
         retrieved: list[dict] = []
         if not is_first_tool_call:
             retrieved = self._memory.search(
                 query=endpoint.name or endpoint.endpoint_id,
-                scope="session",
+                scope=f"session:{conversation_id}",
                 top_k=5,
-                conversation_id=conversation_id,
             )
         had_retrieved_memory = len(retrieved) >= 1
+
+        if is_first_tool_call and endpoint.required_parameters and not has_prior_clarification:
+            return AssistantTurnResult(
+                type="clarification",
+                content=_clarification_question(endpoint),
+                endpoint_id=None,
+                arguments=None,
+                had_retrieved_memory=False,
+            )
 
         # Build context from session state and recent messages
         session_context = _format_session_context(session_state)
@@ -162,11 +211,11 @@ class AssistantAgent:
         response = self._call_llm(prompt)
         if not response:
             return AssistantTurnResult(
-                type="clarification",
-                content="Could you provide more details about what you need?",
-                endpoint_id=None,
-                arguments=None,
-                had_retrieved_memory=False,
+                type="tool_call",
+                content=None,
+                endpoint_id=endpoint.endpoint_id,
+                arguments=_template_arguments(endpoint),
+                had_retrieved_memory=had_retrieved_memory,
             )
 
         response = response.strip()
