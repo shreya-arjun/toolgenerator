@@ -1,0 +1,29 @@
+{
+  "tool_name": "Weather Lookup",
+  "tool_description": "Get weather forecasts and conditions for a city",
+  "title": "Weather Lookup",
+  "api_list": [
+    {
+      "name": "get_forecast",
+      "url": "https://example.com/weather/forecast",
+      "description": "Get forecast for a city",
+      "method": "GET",
+      "required_parameters": [
+        {
+          "name": "city",
+          "type": "STRING",
+          "description": "City name",
+          "default": "San Francisco"
+        }
+      ],
+      "optional_parameters": [
+        {
+          "name": "units",
+          "type": "STRING",
+          "description": "Units to use",
+          "default": "metric"
+        }
+      ]
+    }
+  ]
+}

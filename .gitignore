@@ -1,1 +1,5 @@
-data/
+artifacts/
+*.jsonl
+__pycache__/
+.env
+data/toolenv/

@@ -2,4 +2,5 @@ mem0ai
 networkx
 openai
 pydantic>=2
+pytest>=8
 typer>=0.12

@@ -8,6 +8,7 @@ Requires-Dist: mem0ai
 Requires-Dist: networkx
 Requires-Dist: openai
 Requires-Dist: pydantic>=2
+Requires-Dist: pytest>=8
 Requires-Dist: typer>=0.12
 
 # ToolGenerator
@@ -23,3 +24,26 @@ Internship assessment project.
 3. Download ToolBench data from Google Drive and place at `data/toolenv/tools/`
 4. `pip install -e .`
 5. Run: `toolgenerator build --tools-path data/toolenv/tools`
+
+## Run End-To-End
+
+1. `toolgenerator build --tools-path data/toolenv/tools`
+2. `toolgenerator generate --output artifacts/generated.jsonl --num 100 --seed 42`
+3. `toolgenerator validate --input artifacts/generated.jsonl`
+4. `toolgenerator metrics --input artifacts/generated.jsonl`
+
+## Diversity Experiment
+
+Run A, corpus memory disabled:
+`toolgenerator generate --output artifacts/run_a.jsonl --num 100 --seed 42 --no-corpus-memory`
+
+Run B, corpus memory enabled:
+`toolgenerator generate --output artifacts/run_b.jsonl --num 100 --seed 42`
+
+Compare the two runs:
+`toolgenerator metrics --input artifacts/run_a.jsonl --compare artifacts/run_b.jsonl`
+
+## Tests
+
+Run the full test suite with:
+`pytest tests/`

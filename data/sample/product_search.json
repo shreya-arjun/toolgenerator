@@ -1,0 +1,37 @@
+{
+  "tool_name": "Product Search",
+  "tool_description": "Search for products and fetch product details",
+  "title": "Product Search",
+  "api_list": [
+    {
+      "name": "search_products",
+      "url": "https://example.com/products/search",
+      "description": "Search products by keyword",
+      "method": "GET",
+      "required_parameters": [
+        {
+          "name": "query",
+          "type": "STRING",
+          "description": "Search query",
+          "default": "laptop"
+        }
+      ],
+      "optional_parameters": []
+    },
+    {
+      "name": "get_product_details",
+      "url": "https://example.com/products/details",
+      "description": "Get details for a product id",
+      "method": "GET",
+      "required_parameters": [
+        {
+          "name": "product_id",
+          "type": "STRING",
+          "description": "Product identifier",
+          "default": "prod-001"
+        }
+      ],
+      "optional_parameters": []
+    }
+  ]
+}
