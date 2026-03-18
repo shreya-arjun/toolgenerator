@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
 from toolgenerator.registry.loader import load_toolbench_tools
-from toolgenerator.registry.normalizer import Endpoint, Tool, normalize_tool, tool_to_dict
+from toolgenerator.registry.normalizer import Endpoint, Parameter, Tool, normalize_tool, tool_to_dict
 
 
 class ToolRegistry:
@@ -69,3 +70,63 @@ class ToolRegistry:
         return {
             "tools": [tool_to_dict(t) for t in self._tools],
         }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> ToolRegistry:
+        """Load a ToolRegistry from a dict like the output of to_dict()."""
+        raw_tools = data.get("tools", [])
+        tools: list[Tool] = []
+        for raw_tool in raw_tools:
+            if not isinstance(raw_tool, dict):
+                continue
+            endpoints: list[Endpoint] = []
+            for raw_ep in raw_tool.get("endpoints", []):
+                if not isinstance(raw_ep, dict):
+                    continue
+                required_parameters = [
+                    Parameter(**p)
+                    for p in raw_ep.get("required_parameters", [])
+                    if isinstance(p, dict)
+                ]
+                optional_parameters = [
+                    Parameter(**p)
+                    for p in raw_ep.get("optional_parameters", [])
+                    if isinstance(p, dict)
+                ]
+                endpoints.append(
+                    Endpoint(
+                        endpoint_id=raw_ep.get("endpoint_id", ""),
+                        name=raw_ep.get("name", ""),
+                        url=raw_ep.get("url", ""),
+                        description=raw_ep.get("description", ""),
+                        method=raw_ep.get("method", "GET"),
+                        required_parameters=required_parameters,
+                        optional_parameters=optional_parameters,
+                        response_schema=raw_ep.get("response_schema"),
+                    )
+                )
+            tools.append(
+                Tool(
+                    tool_id=raw_tool.get("tool_id", ""),
+                    tool_name=raw_tool.get("tool_name", ""),
+                    tool_description=raw_tool.get("tool_description", ""),
+                    title=raw_tool.get("title", ""),
+                    category=raw_tool.get("category", ""),
+                    endpoints=endpoints,
+                )
+            )
+        return cls(tools)
+
+    def save_json(self, path: Path | str) -> None:
+        """Write the registry artifact to disk as JSON."""
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(self.to_dict(), f, indent=2)
+
+    @classmethod
+    def load_json(cls, path: Path | str) -> ToolRegistry:
+        """Read the registry artifact from disk."""
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return cls.from_dict(data)

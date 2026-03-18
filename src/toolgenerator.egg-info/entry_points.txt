@@ -1,0 +1,2 @@
+[console_scripts]
+toolgenerator = toolgenerator.cli.main:app

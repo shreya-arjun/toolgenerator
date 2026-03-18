@@ -8,6 +8,7 @@ Requires-Dist: mem0ai
 Requires-Dist: networkx
 Requires-Dist: openai
 Requires-Dist: pydantic>=2
+Requires-Dist: typer>=0.12
 
 # ToolGenerator
 
