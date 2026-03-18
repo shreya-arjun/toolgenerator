@@ -34,3 +34,8 @@ Compare the two runs:
 
 Run the full test suite with:
 `pytest tests/`
+
+## Notes
+
+Deprecation warnings from `google.protobuf` may appear at runtime. 
+These originate from mem0's Qdrant dependency and do not affect functionality.
