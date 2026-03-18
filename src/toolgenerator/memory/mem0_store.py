@@ -21,8 +21,7 @@ class Mem0MemoryStore(MemoryStore):
         self._memory = Memory()
 
     def add(self, content: str, scope: str, metadata: dict) -> None:
-        conversation_id = metadata.get("conversation_id")
-        user_id = _user_id(scope, conversation_id)
+        user_id = _user_id(scope)
         self._memory.add(
             messages=[{"role": "user", "content": content}],
             user_id=user_id,
@@ -34,9 +33,8 @@ class Mem0MemoryStore(MemoryStore):
         query: str,
         scope: str,
         top_k: int = 5,
-        conversation_id: str | None = None,
     ) -> list[dict]:
-        user_id = _user_id(scope, conversation_id)
+        user_id = _user_id(scope)
         raw = self._memory.search(
             query=query,
             user_id=user_id,

@@ -35,12 +35,12 @@ class MemoryStore(ABC):
         ...
 
 
-def _user_id(scope: str, conversation_id: str | None = None) -> str:
-    """Build a backend namespace from scope, preserving scoped session keys."""
-    if scope.startswith("session:"):
-        return scope
-    if scope == "session":
-        return f"session:{conversation_id or ''}"
+def _user_id(scope: str) -> str:
+    """Build a backend namespace directly from the scope string."""
+    if ":" in scope:
+        prefix, suffix = scope.split(":", 1)
+        if prefix == "session":
+            return f"session:{suffix}"
     if scope == "corpus":
         return "corpus"
     return scope
@@ -59,7 +59,7 @@ class FakeMemoryStore(MemoryStore):
         self._store: dict[str, list[dict[str, Any]]] = {}
 
     def add(self, content: str, scope: str, metadata: dict) -> None:
-        user_id = _user_id(scope, metadata.get("conversation_id"))
+        user_id = _user_id(scope)
         if user_id not in self._store:
             self._store[user_id] = []
         self._store[user_id].append({"content": content, "metadata": dict(metadata)})
@@ -69,9 +69,8 @@ class FakeMemoryStore(MemoryStore):
         query: str,
         scope: str,
         top_k: int = 5,
-        conversation_id: str | None = None,
     ) -> list[dict]:
-        user_id = _user_id(scope, conversation_id)
+        user_id = _user_id(scope)
         entries = self._store.get(user_id, [])
         # Simple "search": return all entries for this scope, capped by top_k
         # (no real retrieval; tests only need add -> search returns stored entry)

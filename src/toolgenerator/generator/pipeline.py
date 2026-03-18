@@ -87,7 +87,10 @@ def run_pipeline(
     sampler_agent = SamplerAgent(graph_sampler)
 
     written = 0
-    for _ in range(num_conversations):
+    attempts = 0
+    max_attempts = num_conversations * 3
+    while written < num_conversations and attempts < max_attempts:
+        attempts += 1
         conversation_id = str(uuid.uuid4())
         tool_chain = sampler_agent.propose_tool_chain(pattern_type, length=3, count=2)
         if not tool_chain:
