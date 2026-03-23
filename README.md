@@ -2,8 +2,6 @@
 
 Offline multi-agent tool-use conversation generator.
 
-Internship assessment project.
-
 ## Installation
 
 1. `git clone <repo>`
